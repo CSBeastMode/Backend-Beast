@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'beastmode.wsgi.application'
 
 # Grab db_url from heroku unless local
 try:
-    DATABASE_URL = make_url(config('DATABASE_URL'))
+    db_url = make_url(config('DATABASE_URL'))
 except:
-    DATABASE_URL = make_url(os.getenv('DATABASE_URL'))
+    db_url = make_url(os.getenv('DATABASE_URL'))
 
 # This is the original code
 # DATABASES = {
@@ -97,10 +97,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'eqmyqdcd',
-        'USER': url.username,
-        'PASSWORD': url.password,
-        'HOST': url.host,
-        'PORT': url.port,
+        'USER': db_url.username,
+        'PASSWORD': db_url.password,
+        'HOST': db_url.host,
+        'PORT': db_url.port,
     }
 }
 
