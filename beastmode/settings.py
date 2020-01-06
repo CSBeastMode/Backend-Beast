@@ -88,6 +88,8 @@ DATABASE_URL = make_url(config('DATABASE_URL'))
 # This should connect to the elephant sql database
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql'
+        'NAME': 'eqmyqdcd'
         'USER': url.username,
         'PASSWORD': url.password,
         'HOST': url.host,
