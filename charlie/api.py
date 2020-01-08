@@ -19,8 +19,10 @@ def initialize(request):
     player_id = player.id
     uuid = player.uuid
     room = player.room()
+    xCoord = room.x
+    yCoord = room.y
     players = room.playerNames(player_id)
-    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players}, safe=True)
+    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description, 'x_coord':xCoord, 'y_coord':yCoord, 'players':players}, safe=True)
 
 
 # @csrf_exempt
@@ -35,52 +37,18 @@ def move(request):
     direction = data['direction']
     room = player.room()
     nextRoomID = None
-    # if direction == "n":
-    #     nextRoomID = room.n_to
-    # elif direction == "s":
-    #     nextRoomID = room.s_to
-    # elif direction == "e":
-    #     nextRoomID = room.e_to
-    # elif direction == "w":
-    #     nextRoomID = room.w_to
-    ######### Testing with current iteration ##########
     if direction == "n":
-        nextRoomX = room.n_to_x
-        nextRoomY = room.n_to_y
-        for tile in Room.objects.all():
-            if nextRoomX == tile.coord_x and nextRoomY == tile.coord_y:
-                nextRoomID = tile.id
-        # xResult = Room.objects.filter(coord_x=nextRoomX)
-        # print(f'\nxResult: {xResult}')
-        # yResult = xResult.filter(coord_y=nextRoomY)
-        # print(f'\nyResult: {yResult}')
-        # nextRoom = Room.objects.filter(coord_x=nextRoomX).get(coord_y=nextRoomY)
-        # if nextRoom is None:
-        #     pass
-        # print(f'\n{nextRoom}')
-        # nextRoomID = nextRoom.id
-        # print(f'\n{nextRoomID}')
+        nextRoomID = room.n_to
     elif direction == "s":
-        nextRoomX = room.s_to_x
-        nextRoomY = room.s_to_y
-        for tile in Room.objects.all():
-            if nextRoomX == tile.coord_x and nextRoomY == tile.coord_y:
-                nextRoomID = tile.id
+        nextRoomID = room.s_to
     elif direction == "e":
-        nextRoomX = room.e_to_x
-        nextRoomY = room.e_to_y
-        for tile in Room.objects.all():
-            if nextRoomX == tile.coord_x and nextRoomY == tile.coord_y:
-                nextRoomID = tile.id
+        nextRoomID = room.e_to
     elif direction == "w":
-        nextRoomX = room.w_to_x
-        nextRoomY = room.w_to_y
-        for tile in Room.objects.all():
-            if nextRoomX == tile.coord_x and nextRoomY == tile.coord_y:
-                nextRoomID = tile.id
-    ##########
+        nextRoomID = room.w_to
     if nextRoomID is not None and nextRoomID > 0:
         nextRoom = Room.objects.get(id=nextRoomID)
+        xCoord = nextRoom.x
+        yCoord = nextRoom.y
         player.currentRoom=nextRoomID
         player.save()
         players = nextRoom.playerNames(player_id)
@@ -90,10 +58,10 @@ def move(request):
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         # for p_uuid in nextPlayerUUIDs:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'players':players, 'error_msg':""}, safe=True)
+        return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'x_coord':xCoord, 'y_coord':yCoord, 'players':players, 'error_msg':""}, safe=True)
     else:
         players = room.playerNames(player_id)
-        return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players, 'error_msg':"You cannot move that way."}, safe=True)
+        return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'x_coord':room.x, 'y_coord':room.y, 'players':players, 'error_msg':"You cannot move that way."}, safe=True)
 
 
 @csrf_exempt
