@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from decouple import config
 from sqlalchemy.engine.url import make_url
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +30,7 @@ except: # If ran locally get from env
     SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -161,6 +163,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
+        # Don't need since everything is token based; avoid CSRF errors
         # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
@@ -174,3 +177,6 @@ SITE_ID = 1
 
 # Stops the registration from erroring due to failing to email verification
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())

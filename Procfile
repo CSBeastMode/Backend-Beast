@@ -1,0 +1,1 @@
+web: gunicorn beastmode.wsgi:application --log-file -
