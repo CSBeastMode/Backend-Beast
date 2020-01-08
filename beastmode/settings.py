@@ -46,6 +46,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -149,16 +155,22 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Boilerplate for REST framework
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
 
+# Allows outside connections
 CORS_ORIGIN_ALLOW_ALL = True
+
+# For allauth (registration)
+SITE_ID = 1
+
+# Stops the registration from erroring due to failing to email verification
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
