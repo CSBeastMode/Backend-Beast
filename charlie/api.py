@@ -80,3 +80,16 @@ def say(request):
     # send to self as well
     pusher.trigger(f'p-channel-{player_uuid}', u'broadcast', {f'{player.user.username}':f'{message}'})
     return JsonResponse({'name':player.user.username, 'message':message, 'chat_type':"say"}, safe=True)
+
+
+# Broadcast to all players
+@csrf_exempt
+@api_view(["POST"])
+def shout(request):
+    player = request.user.player
+    data = json.loads(request.body)
+    message = data['message']
+    allPlayers = Player.objects.all()
+    for person in allPlayers:
+        pusher.trigger(f'p-channel-{person.uuid}', u'broadcast', {f'{player.user.username}':f'{message}'})
+    return JsonResponse({'name':player.user.username, 'message':message, 'chat_type':"shout"}, safe=True)
