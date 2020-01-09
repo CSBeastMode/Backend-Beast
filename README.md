@@ -1,134 +1,91 @@
-🚫 Note: All lines that start with 🚫 are instructions and should be deleted before this is posted to your portfolio. This is intended to be a guideline. Feel free to add your own flare to it.
-
-🚫 The numbers 1️⃣ through 3️⃣ next to each item represent the week that part of the docs needs to be comepleted by.  Make sure to delete the numbers by the end of Labs.
-
-🚫 Each student has a required minimum number of meaningful PRs each week per the rubric.  Contributing to docs does NOT count as a PR to meet your weekly requirements.
-
 # API Documentation
 
-#### 1️⃣ Backend delpoyed at [🚫name service here](🚫add URL here) <br>
+#### Backend delpoyed at [Heroku](https://lambda-beastmode.herokuapp.com) <br>
 
-## 1️⃣ Getting started
 
 To get the server running locally:
 
-🚫 adjust these scripts to match your project
-
 - Clone this repo
-- **yarn install** to install all required dependencies
-- **yarn server** to start the local server
-- **yarn test** to start server using testing environment
+- **pipenv install** to install required dependencies
+- From CLI /manage.py runserver
 
-### Backend framework goes here
+### Backend framework made with Django
 
 🚫 Why did you choose this framework?
 
--    Point One
--    Point Two
--    Point Three
--    Point Four
+-    Flexibility
+-    Reliability
+-    Scalability
+-    Simplicity
+-    Batteries Included
+-    ORM
+-    Middleware support
 
-## 2️⃣ Endpoints
+##  Endpoints
 
-🚫This is a placeholder, replace the endpoints, access controll, and descriptioin to match your project
-
-#### Organization Routes
-
-| Method | Endpoint                | Access Control | Description                                  |
-| ------ | ----------------------- | -------------- | -------------------------------------------- |
-| GET    | `/organizations/:orgId` | all users      | Returns the information for an organization. |
-| PUT    | `/organizatoins/:orgId` | owners         | Modify an existing organization.             |
-| DELETE | `/organizations/:orgId` | owners         | Delete an organization.                      |
+       |
 
 #### User Routes
 
 | Method | Endpoint                | Access Control      | Description                                        |
 | ------ | ----------------------- | ------------------- | -------------------------------------------------- |
-| GET    | `/users/current`        | all users           | Returns info for the logged in user.               |
-| GET    | `/users/org/:userId`    | owners, supervisors | Returns all users for an organization.             |
-| GET    | `/users/:userId`        | owners, supervisors | Returns info for a single user.                    |
+| GET    | `/api/init/`        | all users           | Initializes the map and player object from User token.               |
+| POST    | `/api/move/`    | all users | Moves player from room to room.             |
+| POST    | `/api/say/`        | all users | Displays text message to all Users in Room.                    |
+
+
+# login/ register
+
 | POST   | `/users/register/owner` | none                | Creates a new user as owner of a new organization. |
 | PUT    | `/users/:userId`        | owners, supervisors |                                                    |
 | DELETE | `/users/:userId`        | owners, supervisors |                                                    |
 
 # Data Model
 
-🚫This is just an example. Replace this with your data model
-
-#### 2️⃣ ORGANIZATIONS
+####  Room
 
 ---
 
 ```
 {
-  id: UUID
-  name: STRING
-  industry: STRING
-  paid: BOOLEAN
-  customer_id: STRING
-  subscription_id: STRING
+  id: INTEGER 
+  title: STRING
+  description: STRING
+  x: INTEGER
+  y: INTEGER
+  n_to: INTEGER
+  e_to: INTEGER
+  s_to: INTEGER
+  w_to: INTEGER
 }
 ```
 
-#### USERS
+#### Player
 
 ---
 
 ```
 {
-  id: UUID
-  organization_id: UUID foreign key in ORGANIZATIONS table
-  first_name: STRING
-  last_name: STRING
-  role: STRING [ 'owner', 'supervisor', 'employee' ]
-  email: STRING
-  phone: STRING
-  cal_visit: BOOLEAN
-  emp_visit: BOOLEAN
-  emailpref: BOOLEAN
-  phonepref: BOOLEAN
+  user: username
+  currentRoom : INTEGER
+  uuid: UUID
 }
 ```
 
-## 2️⃣ Actions
 
-🚫 This is an example, replace this with the actions that pertain to your backend
-
-`getOrgs()` -> Returns all organizations
-
-`getOrg(orgId)` -> Returns a single organization by ID
-
-`addOrg(org)` -> Returns the created org
-
-`updateOrg(orgId)` -> Update an organization by ID
-
-`deleteOrg(orgId)` -> Delete an organization by ID
-<br>
-<br>
-<br>
-`getUsers(orgId)` -> if no param all users
-
-`getUser(userId)` -> Returns a single user by user ID
-
-`addUser(user object)` --> Creates a new user and returns that user. Also creates 7 availabilities defaulted to hours of operation for their organization.
-
-`updateUser(userId, changes object)` -> Updates a single user by ID.
-
-`deleteUser(userId)` -> deletes everything dependent on the user
-
-## 3️⃣ Environment Variables
+##  Environment Variables
 
 In order for the app to function correctly, the user must set up their own environment variables.
 
 create a .env file that includes the following:
 
-🚫 These are just examples, replace them with the specifics for your app
-    
-    *  STAGING_DB - optional development db for using functionality not available in SQLite
-    *  NODE_ENV - set to "development" until ready for "production"
-    *  JWT_SECRET - you can generate this by using a python shell and running import random''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&amp;*(-*=+)') for i in range(50)])
-    *  SENDGRID_API_KEY - this is generated in your Sendgrid account
-    *  stripe_secret - this is generated in the Stripe dashboard
+    * SECRET_KEY - authorization token
+    * DATABASE_URL - location of database production/local
+    * DEBUG - TRUE/FALSE
+    * PUSHER_APP_ID - ID
+    * PUSHER_KEY - KEY
+    * PUSHER_SECRET - Token
+    * PUSHER_CLUSTER - AWS cluster server
     
 ## Contributing
 
@@ -168,5 +125,4 @@ These contribution guidelines have been adapted from [this good-Contributing.md-
 
 ## Documentation
 
-See [Frontend Documentation](🚫link to your frontend readme here) for details on the fronend of our project.
-🚫 Add DS iOS and/or Andriod links here if applicable.
+See [Frontend Documentation](https://github.com/CSBeastMode/front-end/tree/auth) for details on the fronend of our project.
