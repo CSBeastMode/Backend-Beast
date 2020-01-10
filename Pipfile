@@ -1,21 +1,22 @@
 [[source]]
+name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-name = "pypi"
-
-[packages]
-django = "*"
-djangorestframework = "*"
-python-decouple = "*"
-django-rest-auth = "*"
-django-allauth = "*"
-pusher = "*"
-django-cors-headers = "*"
-gunicorn = "*"
-django-heroku = "*"
-django-rest-api = "*"
 
 [dev-packages]
 
+[packages]
+django = "*"
+python-decouple = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
+django-rest-auth = "*"
+django-allauth = "*"
+django-heroku = "*"
+gunicorn = "*"
+pusher = "*"
+
 [requires]
-python_version = "3.7"
+python_version = "3.8"
