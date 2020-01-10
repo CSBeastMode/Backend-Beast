@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
 import json
+from django.core import serializers
+from django.http import HttpResponse
 
 # instantiate pusher
 pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -62,6 +64,16 @@ def move(request):
     else:
         players = room.playerNames(player_id)
         return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'x_coord':room.x, 'y_coord':room.y, 'players':players, 'error_msg':"You cannot move that way."}, safe=True)
+
+
+# Send details of all the rooms
+@csrf_exempt
+@api_view(["GET"])
+def rooms(request):
+    allRooms = Room.objects.all()
+    allRoomsList = serializers.serialize('json', allRooms)
+    data = json.loads(allRoomsList)
+    return JsonResponse(data, safe=False)
 
 
 # Chat within the room
