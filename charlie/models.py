@@ -11,10 +11,10 @@ class Room(models.Model):
     description = models.CharField(max_length=500, default="DEFAULT DESCRIPTION")
     x = models.IntegerField(default=999)
     y = models.IntegerField(default=999)
-    n_to = models.IntegerField(default=0)
-    e_to = models.IntegerField(default=0)
-    s_to = models.IntegerField(default=0)
-    w_to = models.IntegerField(default=0)
+    n_to = models.IntegerField(default=None, null=True)
+    e_to = models.IntegerField(default=None, null=True)
+    s_to = models.IntegerField(default=None, null=True)
+    w_to = models.IntegerField(default=None, null=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
