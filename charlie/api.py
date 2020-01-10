@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
 import json
+from django.core import serializers
+from django.http import HttpResponse
 
 # instantiate pusher
 pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -55,13 +57,23 @@ def move(request):
         currentPlayerUUIDs = room.playerUUIDs(player_id)
         nextPlayerUUIDs = nextRoom.playerUUIDs(player_id)
         for p_uuid in currentPlayerUUIDs:
-            pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
+            pusher.trigger(f'p-channel-{p_uuid}', u'movement', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         for p_uuid in nextPlayerUUIDs:
-            pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
+            pusher.trigger(f'p-channel-{p_uuid}', u'movement', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
         return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'x_coord':xCoord, 'y_coord':yCoord, 'players':players, 'error_msg':""}, safe=True)
     else:
         players = room.playerNames(player_id)
         return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'x_coord':room.x, 'y_coord':room.y, 'players':players, 'error_msg':"You cannot move that way."}, safe=True)
+
+
+# Send details of all the rooms
+@csrf_exempt
+@api_view(["GET"])
+def rooms(request):
+    allRooms = Room.objects.all()
+    allRoomsList = serializers.serialize('json', allRooms)
+    data = json.loads(allRoomsList)
+    return JsonResponse(data, safe=False)
 
 
 # Chat within the room
@@ -76,10 +88,10 @@ def say(request):
     room = player.room()
     currentPlayerUUIDs = room.playerUUIDs(player_id)
     for p_uuid in currentPlayerUUIDs:
-        pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {f'{player.user.username}':f'{message}'})
+        pusher.trigger(f'p-channel-{p_uuid}', u'say', {f'{player.user.username}':f'{message}'})
     # send to self as well
-    pusher.trigger(f'p-channel-{player_uuid}', u'broadcast', {f'{player.user.username}':f'{message}'})
-    return JsonResponse({'name':player.user.username, 'message':message, 'chat_type':"say"}, safe=True)
+    pusher.trigger(f'p-channel-{player_uuid}', u'say', {f'{player.user.username}':f'{message}'})
+    return JsonResponse({'name':player.user.username, 'message':message, 'chat_type':"say", 'error_msg':""}, safe=True)
 
 
 # Broadcast to all players
@@ -91,5 +103,28 @@ def shout(request):
     message = data['message']
     allPlayers = Player.objects.all()
     for person in allPlayers:
-        pusher.trigger(f'p-channel-{person.uuid}', u'broadcast', {f'{player.user.username}':f'{message}'})
-    return JsonResponse({'name':player.user.username, 'message':message, 'chat_type':"shout"}, safe=True)
+        pusher.trigger(f'p-channel-{person.uuid}', u'shout', {f'{player.user.username} shouts':f'{message}'})
+    return JsonResponse({'name':player.user.username, 'message':message, 'chat_type':"shout", 'error_msg':""}, safe=True)
+
+
+# Whisper to single person
+@csrf_exempt
+@api_view(["POST"])
+def whisper(request):
+    player = request.user.player
+    player_uuid = player.uuid
+    data = json.loads(request.body)
+    message = data['message']
+    recipientName = data['to']
+    # we need to grab the user object first
+    user = User.objects.filter(username=recipientName).first()
+    if user is not None:
+        # user object allows us to grab the creation id to grab the player object
+        recipient = Player.objects.get(user=user.id)
+        pusher.trigger(f'p-channel-{recipient.uuid}', u'whisper', {f'{player.user.username} whispers':f'{message}'})
+        # send to self as well
+        pusher.trigger(f'p-channel-{player_uuid}', u'whisper', {f'Whisper to {recipient.user}':f'{message}'})
+        return JsonResponse({'name':player.user.username, 'message':message, 'to':recipientName, 'chat_type':"whisper", 'error_msg':""}, safe=True)
+    else:
+        pusher.trigger(f'p-channel-{player.uuid}', u'error', {'Error':f'{recipientName} does not exist.'})
+        return JsonResponse({'name':player.user.username, 'message':message, 'to':recipientName, 'chat_type':"whisper", 'error_msg':f"{recipientName} does not exist."}, safe=True, status=404)
